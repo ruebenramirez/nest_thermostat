@@ -1,6 +1,8 @@
+#! /usr/bin/python
+
 from flask import Flask
 app = Flask(__name__)
-
+from nest_thermostat import Nest
 
 @app.route('/')
 def hello_world():
