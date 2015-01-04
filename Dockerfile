@@ -13,9 +13,6 @@ RUN pwd
 RUN ls -lah
 RUN pip install -r requirements.txt
 
-
-
-
 VOLUME ["/nest-api"]
 EXPOSE 5000
 CMD ["python", "nest_api.py"]
