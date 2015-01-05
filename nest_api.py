@@ -31,5 +31,13 @@ def nest_status():
     return Response(json.dumps(n.get_status()), mimetype='application/json')
 
 
+@app.route('/temperature')
+def nest_temperature():
+    n = get_nest()
+    temps = {'current': n.show_curtemp(),
+             'target': n.show_target(),
+             'mode': n.show_curmode()}
+    return Response(json.dumps(temps), mimetype='application/json')
+
 if __name__ == '__main__':
     app.run(debug=True, host='0.0.0.0')

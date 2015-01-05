@@ -13,7 +13,7 @@ import json
 
 class Nest:
 
-    def __init__(self, username, password, serial=None, index=0, units="F",
+    def __init__(self, username, password, serial=None, index=0, units='F',
                  debug=False):
         self.username = username
         self.password = password
@@ -21,6 +21,7 @@ class Nest:
         self.units = units
         self.index = index
         self.debug = debug
+        self.status = None
 
     def login(self):
         response = requests.post("https://home.nest.com/user/login",
@@ -53,6 +54,7 @@ class Nest:
 
         self._set_serial(res)
 
+        self.status = res
         # status = ["res.keys", res.keys(),
         #     "res[structure][structure_id].keys", res["structure"][self.structure_id].keys(),
         #     "res[device].keys", res["device"].keys(),
@@ -62,18 +64,20 @@ class Nest:
         return res
 
     def temp_in(self, temp):
-        if (self.units == "F"):
+        if self.units == "F":
             return (temp - 32.0) / 1.8
         else:
             return temp
 
     def temp_out(self, temp):
-        if (self.units == "F"):
+        if self.units is 'F':
             return temp*1.8 + 32.0
         else:
             return temp
 
     def show_status(self):
+        if not self.status:
+            self.get_status()
         shared = self.status["shared"][self.serial]
         device = self.status["device"][self.serial]
 
@@ -84,21 +88,27 @@ class Nest:
             print k + "."*(32-len(k)) + ":", allvars[k]
 
     def show_curtemp(self):
+        if not self.status:
+            self.get_status()
         temp = self.status["shared"][self.serial]["current_temperature"]
         temp = self.temp_out(temp)
 
-        print "%0.1f" % temp
+        return temp
 
     def show_target(self):
+        if not self.status:
+            self.get_status()
         temp = self.status["shared"][self.serial]["target_temperature"]
         temp = self.temp_out(temp)
 
-        print temp
+        return temp
 
     def show_curmode(self):
+        if not self.status:
+            self.get_status()
         mode = self.status["shared"][self.serial]["target_temperature_type"]
 
-        print mode
+        return mode
 
     def _set(self, data, which):
         if (self.debug):
@@ -161,12 +171,9 @@ class Nest:
 
     def _set_serial(self, res):
         """
-        ensure that serial is set
+        helper: ensure that serial is set
         """
         if (self.serial is None):
-            self.device_id = res["structure"][
-                self.structure_id]["devices"][
+            self.device_id = res["structure"][self.structure_id]["devices"][
                 self.index]
             self.serial = self.device_id.split(".")[1]
-
-            self.status = res
