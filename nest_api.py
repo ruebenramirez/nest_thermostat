@@ -12,16 +12,19 @@ class Config(object):
         conf_file = 'nest.cfg'
         conf = ConfigParser.ConfigParser()
         conf.readfp(open(conf_file))
-        self.user = str(conf.get('Nest', 'username')))
+        self.user = str(conf.get('Nest', 'username'))
         self.password = str(conf.get('Nest', 'password'))
         self.serial = str(conf.get('Nest', 'Serial'))
         self.index = str(conf.get('Nest', 'Index'))
+        self.units = "F"
+
 
 def get_nest():
     opts = Config()
-    n = Nest(opts.user, opts.password, opts.serial, opts.index, units=units)
+    n = Nest(opts.user, opts.password, serial=opts.serial, units=opts.units)
     n.login()
     return n
+
 
 @app.route('/')
 def nest_status():
