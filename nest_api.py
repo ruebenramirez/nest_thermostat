@@ -1,6 +1,6 @@
 #! /usr/bin/python
 
-from flask import Flask
+from flask import Flask, Response, json
 app = Flask(__name__)
 import ConfigParser
 from nest_thermostat import Nest
@@ -14,9 +14,8 @@ class Config(object):
         conf.readfp(open(conf_file))
         self.user = str(conf.get('Nest', 'username'))
         self.password = str(conf.get('Nest', 'password'))
-        self.serial = str(conf.get('Nest', 'Serial'))
-        self.index = str(conf.get('Nest', 'Index'))
-        self.units = "F"
+        self.serial = str(conf.get('Nest', 'serial'))
+        self.units = str(conf.get('Nest', 'units'))
 
 
 def get_nest():
@@ -29,7 +28,7 @@ def get_nest():
 @app.route('/')
 def nest_status():
     n = get_nest()
-    return n.get_status()
+    return Response(json.dumps(n.get_status()), mimetype='application/json')
 
 
 if __name__ == '__main__':

@@ -11,3 +11,5 @@ sudo docker run -d \
     -v $WORKING_DIR:/nest-api \
     --name nest-api \
     nest-api
+
+sudo docker logs -f nest-api
