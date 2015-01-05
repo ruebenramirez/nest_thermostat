@@ -9,7 +9,7 @@ from nest_thermostat import Nest
 class Config(object):
 
     def __init__(self):
-        conf_file = 'nest.cfg'
+        conf_file = 'nest_api.cfg'
         conf = ConfigParser.ConfigParser()
         conf.readfp(open(conf_file))
         self.user = str(conf.get('Nest', 'username'))
