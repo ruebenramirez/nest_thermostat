@@ -1,1 +1,3 @@
 Flask==0.10.1
+redis-simple-cache==0.0.7
+requests
