@@ -7,8 +7,17 @@ updated by Bob Pasker bob@pasker.net http://pasker.net
 and Rueben Ramirez ruebenramirez@gmail.com http://ruebenramirez.com
 """
 
+import os
 import requests
 import json
+from redis_cache import cache_it, SimpleCache
+
+
+redis_host = os.environ['REDIS-HOST_PORT_6379_TCP_ADDR']
+twenty_seconds = 20
+docker_cache = SimpleCache(limit=1000, expire=twenty_seconds,
+                           hashkeys=True, host=redis_host,
+                           port=6379, db=1, namespace='nest')
 
 
 class Nest:
@@ -51,15 +60,16 @@ class Nest:
         res = response.json()
 
         self.structure_id = res["structure"].keys()[0]
-
         self._set_serial(res)
-
         self.status = res
         # status = ["res.keys", res.keys(),
-        #     "res[structure][structure_id].keys", res["structure"][self.structure_id].keys(),
-        #     "res[device].keys", res["device"].keys(),
-        #     "res[device][serial].keys", res["device"][self.serial].keys(),
-        #     "res[shared][serial].keys", res["shared"][self.serial].keys()]
+        #           "res[structure][structure_id].keys",
+        #               res["structure"][self.structure_id].keys(),
+        #           "res[device].keys", res["device"].keys(),
+        #           "res[device][serial].keys",
+        #               res["device"][self.serial].keys(),
+        #           "res[shared][serial].keys",
+        #               res["shared"][self.serial].keys()]
         # return ''.join(status)
         return res
 
@@ -75,6 +85,7 @@ class Nest:
         else:
             return temp
 
+    @cache_it(cache=docker_cache)
     def show_status(self):
         if not self.status:
             self.get_status()
@@ -87,28 +98,35 @@ class Nest:
         for k in sorted(allvars.keys()):
             print k + "."*(32-len(k)) + ":", allvars[k]
 
+    @cache_it(cache=docker_cache)
     def show_curtemp(self):
         if not self.status:
             self.get_status()
         temp = self.status["shared"][self.serial]["current_temperature"]
         temp = self.temp_out(temp)
-
         return temp
 
+    @cache_it(cache=docker_cache)
     def show_target(self):
         if not self.status:
             self.get_status()
         temp = self.status["shared"][self.serial]["target_temperature"]
         temp = self.temp_out(temp)
-
         return temp
 
+    @cache_it(cache=docker_cache)
     def show_curmode(self):
         if not self.status:
             self.get_status()
         mode = self.status["shared"][self.serial]["target_temperature_type"]
-
         return mode
+
+    @cache_it(cache=docker_cache)
+    def show_humidity(self):
+        if not self.status:
+            self.get_status()
+        humidity = self.status["shared"][self.serial]["current_humidity"]
+        return humidity
 
     def _set(self, data, which):
         if (self.debug):
