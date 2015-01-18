@@ -1,0 +1,5 @@
+[Nest]
+username=NestUser@gmail.com
+password=SecretNestPassword
+serial=MyNestSerialNumber
+temperature_units=F

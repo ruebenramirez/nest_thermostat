@@ -21,7 +21,7 @@ class Config(object):
         self.user = str(conf.get('Nest', 'username'))
         self.password = str(conf.get('Nest', 'password'))
         self.serial = str(conf.get('Nest', 'serial'))
-        self.units = str(conf.get('Nest', 'units'))
+        self.units = str(conf.get('Nest', 'temperature_units'))
 
 
 @cache_it(cache=nest_config)
